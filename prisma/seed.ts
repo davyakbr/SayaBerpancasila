@@ -3,113 +3,122 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Seeding initial Pancasila activities data...');
+  console.log('Restoring user exact 12 activities, weekly scores, and reflection...');
 
   await prisma.activity.deleteMany({});
   await prisma.weeklyScore.deleteMany({});
   await prisma.weeklyReflection.deleteMany({});
 
-  // Week 1 Activities (17 - 23 Agustus 2026)
-  const week1Activities = [
+  const activities = [
     {
       title: 'Melaksanakan upacara bendera dalam rangka memperingati Hari Kemerdekaan Indonesia yang ke-81',
-      date: new Date('2026-08-17T07:00:00.000Z'),
+      date: new Date(1786924800000),
       sila: 3,
       weekNumber: 1,
-      imageUrl: '/images/seed/act_upacara.jpg',
+      imageUrl: '/uploads/doc_1787899164292_2o4fjr.jpeg',
     },
     {
       title: 'Membantu orang tua mencuci piring dan merapikan dapur setelah makan',
-      date: new Date('2026-08-18T18:30:00.000Z'),
+      date: new Date(1787011200000),
       sila: 2,
       weekNumber: 1,
-      imageUrl: '/images/seed/act_cuci_piring.jpg',
+      imageUrl: null,
     },
     {
-      title: 'Membaca Al-Qur\'an pagi hari dan berdoa sebelum memulai pelajaran',
-      date: new Date('2026-08-19T06:15:00.000Z'),
+      title: 'Melaksanakan pembiasaan keagamaan dengan membaca al-Quran pada pagi hari',
+      date: new Date(1787097600000),
       sila: 1,
       weekNumber: 1,
-      imageUrl: '/images/seed/act_ngaji.jpg',
+      imageUrl: null,
     },
     {
-      title: 'Bermusyawarah dengan kelompok belajar mengenai penyelesaian tugas proyek',
-      date: new Date('2026-08-20T13:30:00.000Z'),
+      title: 'Kerja kelompok dengan teman teman dan berdiskusi tugas saat Pelajaran Bahasa Indonesi',
+      date: new Date(1787184000000),
       sila: 4,
       weekNumber: 1,
-      imageUrl: '/images/seed/act_diskusi.jpg',
+      imageUrl: null,
     },
     {
-      title: 'Membagikan makanan MBG dengan teman sekelas secara adil tanpa membeda-bedakan',
-      date: new Date('2026-08-21T12:00:00.000Z'),
+      title: 'Piket mengambil MBG dan membagikannya dengan adil',
+      date: new Date(1787270400000),
       sila: 5,
       weekNumber: 1,
-      imageUrl: '/images/seed/act_mbg.jpg',
+      imageUrl: null,
     },
     {
-      title: 'Berkumpul dan bermain bersama teman-teman sekolah dengan rukun',
-      date: new Date('2026-08-22T16:00:00.000Z'),
+      title: 'Pergi berkumpul dengan teman teman luar sekolah untuk bermain bersama',
+      date: new Date(1787356800000),
       sila: 3,
       weekNumber: 1,
-      imageUrl: '/images/seed/act_bermain.jpg',
+      imageUrl: null,
     },
     {
-      title: 'Memberikan kursi kepada lansia di bus TransJakarta',
-      date: new Date('2026-08-23T15:20:00.000Z'),
+      title: 'Memberikan kursi saat di TransJakarta kepada lansia',
+      date: new Date(1787443200000),
       sila: 2,
       weekNumber: 1,
-      imageUrl: '/images/seed/act_transjakarta.jpg',
+      imageUrl: null,
     },
-  ];
-
-  // Week 2 Activities (24 - 30 Agustus 2026)
-  const week2Activities = [
     {
-      title: 'Mengikuti sholat berjamaah di musholla sekolah dengan khusyuk',
-      date: new Date('2026-08-24T12:15:00.000Z'),
+      title: 'Berpamitan kepada orang tua saat ingin berangkat sekolah',
+      date: new Date(1787529600000),
+      sila: 2,
+      weekNumber: 2,
+      imageUrl: null,
+    },
+    {
+      title: 'berkumpul dan makan bersama sama dengan teman selepas pulang dari kerja kelompok',
+      date: new Date(1787616000000),
+      sila: 2,
+      weekNumber: 2,
+      imageUrl: null,
+    },
+    {
+      title: 'Kerja kelompok bahasa Indonesia mendiskusikan iklan produk bersama dengan teman teman',
+      date: new Date(1787702400000),
+      sila: 4,
+      weekNumber: 2,
+      imageUrl: null,
+    },
+    {
+      title: 'sholat zuhur berjamaah di sekolah dan mendengarkan pembacaan kultum',
+      date: new Date(1787788800000),
       sila: 1,
       weekNumber: 2,
-      imageUrl: '/images/seed/act_ngaji.jpg',
+      imageUrl: null,
     },
     {
-      title: 'Membantu menyeberangkan jalan seorang anak sekolah di depan gerbang',
-      date: new Date('2026-08-25T06:45:00.000Z'),
-      sila: 2,
+      title: 'Melaksanakan kewajiban sholat jumat di sekolah secara berjamaah',
+      date: new Date(1787875200000),
+      sila: 1,
       weekNumber: 2,
-      imageUrl: '/images/seed/act_cuci_piring.jpg',
-    },
-    {
-      title: 'Piket kebersihan bersama merapikan dan menyapu ruang kelas XII PPLG',
-      date: new Date('2026-08-26T15:00:00.000Z'),
-      sila: 3,
-      weekNumber: 2,
-      imageUrl: '/images/seed/act_upacara.jpg',
+      imageUrl: null,
     },
   ];
 
-  for (const act of [...week1Activities, ...week2Activities]) {
+  for (const act of activities) {
     await prisma.activity.create({ data: act });
   }
 
-  // Weekly Scores (Penilaian Diri Mingguan 1-10)
+  // Weekly Scores (Penilaian Diri Mingguan)
   await prisma.weeklyScore.create({
     data: { weekNumber: 1, month: 'Agustus', year: 2026, score: 8.0 },
   });
   await prisma.weeklyScore.create({
-    data: { weekNumber: 2, month: 'Agustus', year: 2026, score: 8.5 },
+    data: { weekNumber: 2, month: 'Agustus', year: 2026, score: 7.0 },
   });
 
-  // Monthly Reflection Text (Refleksi Bulanan)
+  // Monthly Reflection
   await prisma.weeklyReflection.create({
     data: {
       month: 'Agustus',
       year: 2026,
       averageScore: 8.3,
-      reason: 'Saya telah berusaha menjalankan kegiatan positif seperti mengerjakan PR tepat waktu, beribadah, dan menjaga kebersihan kelas, tapi di pertengahan minggu sempat malas dan belum maksimal dalam membantu pekerjaan di rumah.',
+      reason: 'Saya telah berusaha menerapkan nilai-nilai Pancasila dalam kegiatan harian selama bulan Agustus 2026.',
     },
   });
 
-  console.log('Successfully seeded activities, weekly scores, and monthly reflection!');
+  console.log('Successfully restored user 12 activities, weekly scores, and monthly reflection!');
 }
 
 main()
