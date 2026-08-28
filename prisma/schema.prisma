@@ -1,0 +1,44 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Activity {
+  id          String   @id @default(cuid())
+  title       String
+  date        DateTime
+  sila        Int      // 1 to 5
+  weekNumber  Int      @default(1) // 1, 2, 3, 4
+  description String?
+  score       Int?
+  reflection  String?
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model WeeklyScore {
+  id         String   @id @default(cuid())
+  weekNumber Int
+  month      String   @default("Agustus")
+  year       Int      @default(2026)
+  score      Float    @default(8.4)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([weekNumber, month, year])
+}
+
+model WeeklyReflection {
+  id           String   @id @default(cuid())
+  month        String   @default("Agustus")
+  year         Int      @default(2026)
+  averageScore Float    @default(8.5)
+  reason       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
