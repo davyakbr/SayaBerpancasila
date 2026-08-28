@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     let reflection = await prisma.weeklyReflection.findFirst({
@@ -12,8 +14,8 @@ export async function GET() {
         data: {
           month: 'Agustus',
           year: 2026,
-          averageScore: 8.5,
-          reason: 'Saya telah berusaha menjalankan berbagai kegiatan positif yang mencerminkan nilai-nilai Pancasila selama bulan ini.',
+          averageScore: 8.3,
+          reason: '',
         },
       });
     }
@@ -37,12 +39,14 @@ export async function PUT(request: Request) {
       orderBy: { createdAt: 'desc' },
     });
 
+    const updatedReason = reason !== undefined ? reason : '';
+
     if (reflection) {
       reflection = await prisma.weeklyReflection.update({
         where: { id: reflection.id },
         data: {
-          averageScore: parseFloat(averageScore),
-          reason,
+          averageScore: averageScore !== undefined ? parseFloat(averageScore) : reflection.averageScore,
+          reason: updatedReason,
           month: month || reflection.month,
           year: year ? parseInt(year, 10) : reflection.year,
         },
@@ -50,8 +54,8 @@ export async function PUT(request: Request) {
     } else {
       reflection = await prisma.weeklyReflection.create({
         data: {
-          averageScore: parseFloat(averageScore),
-          reason,
+          averageScore: averageScore !== undefined ? parseFloat(averageScore) : 8.3,
+          reason: updatedReason,
           month: month || 'Agustus',
           year: year ? parseInt(year, 10) : 2026,
         },

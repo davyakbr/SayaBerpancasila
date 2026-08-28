@@ -24,7 +24,7 @@ export default function WeeklyTable({
   // State for weekly scores (Record<weekNumber, score>)
   const [weeklyScores, setWeeklyScores] = useState<Record<number, number>>({
     1: 8.0,
-    2: 8.5,
+    2: 7.0,
     3: 8.0,
     4: 8.0,
   });
@@ -35,10 +35,15 @@ export default function WeeklyTable({
   // State for monthly reflection
   const [isEditingReflection, setIsEditingReflection] = useState(false);
   const [reasonInput, setReasonInput] = useState(
-    reflection?.reason ||
-      'Saya sudah berusaha menjalankan kegiatan positif seperti mengerjakan PR tepat waktu, beribadah, dan membantu orang tua, serta menjaga kebersihan kelas, tapi di pertengahan minggu sempat malas dan belum maksimal dalam membantu pekerjaan di rumah.'
+    reflection?.reason !== undefined ? reflection.reason : ''
   );
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (reflection?.reason !== undefined) {
+      setReasonInput(reflection.reason);
+    }
+  }, [reflection]);
 
   useEffect(() => {
     const fetchScores = async () => {
@@ -47,7 +52,7 @@ export default function WeeklyTable({
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data)) {
-            const map: Record<number, number> = { 1: 8.0, 2: 8.5, 3: 8.0, 4: 8.0 };
+            const map: Record<number, number> = { 1: 8.0, 2: 7.0, 3: 8.0, 4: 8.0 };
             data.forEach((item: any) => {
               map[item.weekNumber] = item.score;
             });
@@ -154,7 +159,7 @@ export default function WeeklyTable({
         </div>
       </div>
 
-      {/* Mode Status Bar & PDF Export (REMOVED LOGIN ADMIN BUTTON FROM BERANDA) */}
+      {/* Mode Status Bar & PDF Export */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-gray-100">
         {isAdmin ? (
           <div className="flex items-center gap-2 bg-emerald-50 text-emerald-800 text-xs px-3.5 py-1.5 rounded-full font-semibold border border-emerald-200">
@@ -217,7 +222,7 @@ export default function WeeklyTable({
                       .filter((a) => a.imageUrl)
                       .map((a) => a.imageUrl as string);
                     const weeklySinglePhoto = docPhotos.length > 0 ? docPhotos[0] : null;
-                    const currentWeekScore = weeklyScores[wNum] ?? 8.0;
+                    const currentWeekScore = weeklyScores[wNum] ?? (wNum === 2 ? 7.0 : 8.0);
 
                     return (
                       <div
@@ -310,6 +315,9 @@ export default function WeeklyTable({
                               <h4 className="font-bold text-gray-800 text-sm">
                                 Penilaian Diri Minggu ke-{wNum} (1-10)
                               </h4>
+                              <p className="text-[11px] text-gray-500 italic">
+                                Nilai kepatuhan penerapan Pancasila minggu ke-{wNum}
+                              </p>
                             </div>
                           </div>
 
@@ -372,7 +380,10 @@ export default function WeeklyTable({
                     </h4>
                     {isAdmin && !isEditingReflection && onSaveReflection && (
                       <button
-                        onClick={() => setIsEditingReflection(true)}
+                        onClick={() => {
+                          setReasonInput(reflection?.reason !== undefined ? reflection.reason : '');
+                          setIsEditingReflection(true);
+                        }}
                         className="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1 bg-blue-50 px-3 py-1 rounded-lg border border-blue-200"
                       >
                         <Edit3 className="w-3.5 h-3.5" /> Edit Refleksi Bulanan (Admin)
@@ -386,6 +397,7 @@ export default function WeeklyTable({
                       <div className="space-y-3">
                         <textarea
                           rows={4}
+                          placeholder="Kosongkan atau tuliskan alasan refleksi bulanan di sini..."
                           value={reasonInput}
                           onChange={(e) => setReasonInput(e.target.value)}
                           className="w-full text-xs sm:text-sm text-gray-800 border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
@@ -409,7 +421,11 @@ export default function WeeklyTable({
                       </div>
                     ) : (
                       <p className="text-xs sm:text-sm text-gray-700 italic leading-relaxed">
-                        "{reflection?.reason || reasonInput}"
+                        {reflection?.reason && reflection.reason.trim() !== '' ? (
+                          `"${reflection.reason}"`
+                        ) : (
+                          <span className="text-gray-400 font-normal">(Belum ada refleksi bulanan yang ditulis)</span>
+                        )}
                       </p>
                     )}
                   </div>

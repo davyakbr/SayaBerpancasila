@@ -84,7 +84,7 @@ export default function DashboardPage() {
             Selamat Datang di <span className="text-amber-400">Saya Berpancasila</span>
           </h1>
           <p className="text-xs sm:text-sm text-rose-100/90 max-w-xl">
-            Jurnal harian penerapan Pancasila tersusun rapi per Bulan & Minggu, penilaian refleksi bulanan, dan cetak portofolio sekolah A4.
+            Jurnal harian penerapan Pancasila per Bulan & Minggu.
           </p>
         </div>
 
