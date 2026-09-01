@@ -315,9 +315,7 @@ export default function WeeklyTable({
                               <h4 className="font-bold text-gray-800 text-sm">
                                 Penilaian Diri Minggu ke-{wNum} (1-10)
                               </h4>
-                              <p className="text-[11px] text-gray-500 italic">
-                                Nilai kepatuhan penerapan Pancasila minggu ke-{wNum}
-                              </p>
+
                             </div>
                           </div>
 
