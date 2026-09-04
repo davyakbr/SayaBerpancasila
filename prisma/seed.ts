@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Restoring user exact 12 activities, weekly scores, and reflection...');
+  console.log('Restoring user exact 12 activities, weekly scores, and 4-week period reflection...');
 
   await prisma.activity.deleteMany({});
   await prisma.weeklyScore.deleteMany({});
@@ -108,17 +108,18 @@ async function main() {
     data: { weekNumber: 2, month: 'Agustus', year: 2026, score: 7.0 },
   });
 
-  // Monthly Reflection
+  // 4-Week Period Reflection (Periode 1: W1-4)
   await prisma.weeklyReflection.create({
     data: {
+      periodNumber: 1,
       month: 'Agustus',
       year: 2026,
       averageScore: 8.3,
-      reason: 'Saya telah berusaha menerapkan nilai-nilai Pancasila dalam kegiatan harian selama bulan Agustus 2026.',
+      reason: 'Selama 4 minggu ini, saya telah berusaha menerapkan nilai-nilai Pancasila dalam kegiatan harian secara konsisten.',
     },
   });
 
-  console.log('Successfully restored user 12 activities, weekly scores, and monthly reflection!');
+  console.log('Successfully restored activities, scores, and 4-week period reflection!');
 }
 
 main()

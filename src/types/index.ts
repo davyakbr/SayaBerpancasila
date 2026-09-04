@@ -14,9 +14,10 @@ export interface ActivityData {
 
 export interface WeeklyReflectionData {
   id: string;
-  month: string;
-  year: number;
-  averageScore: number;
+  periodNumber?: number;
+  month?: string;
+  year?: number;
+  averageScore?: number;
   reason: string;
   createdAt?: string | Date;
   updatedAt?: string | Date;

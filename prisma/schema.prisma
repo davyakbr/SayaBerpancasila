@@ -12,7 +12,7 @@ model Activity {
   title       String
   date        DateTime
   sila        Int      // 1 to 5
-  weekNumber  Int      @default(1) // 1, 2, 3, 4
+  weekNumber  Int      @default(1)
   description String?
   score       Int?
   reflection  String?
@@ -35,10 +35,13 @@ model WeeklyScore {
 
 model WeeklyReflection {
   id           String   @id @default(cuid())
+  periodNumber Int      @default(1) // 1 for W1-4, 2 for W5-8, etc.
   month        String   @default("Agustus")
   year         Int      @default(2026)
   averageScore Float    @default(8.5)
   reason       String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  @@unique([periodNumber, year])
 }
