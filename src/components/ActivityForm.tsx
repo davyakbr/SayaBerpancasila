@@ -20,6 +20,48 @@ function calculateWeekFromDate(dateStr: string): number {
   return 4;
 }
 
+// Client-side image compression helper (avoids Vercel read-only filesystem crash & payload limits)
+const compressImage = (file: File, maxWidth = 1200, maxHeight = 1200, quality = 0.8): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          resolve(dataUrl);
+        } else {
+          resolve(event.target?.result as string);
+        }
+      };
+      img.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err);
+  });
+};
+
 export default function ActivityForm({ initialData, isEdit = false }: ActivityFormProps) {
   const router = useRouter();
 
@@ -52,24 +94,29 @@ export default function ActivityForm({ initialData, isEdit = false }: ActivityFo
     setUploading(true);
     setErrorMsg('');
 
-    const formData = new FormData();
-    formData.append('file', file);
-
     try {
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        setImageUrl(data.imageUrl);
-      } else {
-        setErrorMsg(data.error || 'Gagal mengunggah foto');
-      }
+      // 1. Compress image on client-side
+      const compressedDataUrl = await compressImage(file);
+      setImageUrl(compressedDataUrl);
     } catch (err) {
       console.error(err);
-      setErrorMsg('Terjadi kesalahan saat upload foto');
+      // 2. Fallback to API upload if client compression fails
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setImageUrl(data.imageUrl);
+        } else {
+          setErrorMsg(data.error || 'Gagal mengunggah foto');
+        }
+      } catch (apiErr) {
+        setErrorMsg('Terjadi kesalahan saat memproses foto');
+      }
     } finally {
       setUploading(false);
     }
@@ -181,7 +228,7 @@ export default function ActivityForm({ initialData, isEdit = false }: ActivityFo
               />
             </div>
 
-            {/* Manual Week Number Input (Admin Types Any Week Number) */}
+            {/* Manual Week Number Input */}
             <div className="space-y-2">
               <label className="block text-sm font-bold text-gray-800">
                 Minggu ke- <span className="text-rose-600">*</span>
@@ -199,7 +246,7 @@ export default function ActivityForm({ initialData, isEdit = false }: ActivityFo
                 />
               </div>
               <p className="text-[11px] text-gray-500 italic">
-                Ketikkan secara bebas nomor minggu kegiatan ini (Admin bebas menentukan).
+                Ketikkan secara bebas nomor minggu kegiatan ini.
               </p>
             </div>
           </div>
@@ -263,9 +310,9 @@ export default function ActivityForm({ initialData, isEdit = false }: ActivityFo
                     <Upload className="w-6 h-6" />
                   </div>
                   <p className="text-xs font-bold text-gray-800">
-                    {uploading ? 'Mengunggah Foto...' : 'Klik untuk unggah foto dokumentasi'}
+                    {uploading ? 'Memproses Foto...' : 'Klik untuk unggah foto dokumentasi'}
                   </p>
-                  <p className="text-[11px] text-gray-500">Format PNG, JPG, JPEG (Max 5MB)</p>
+                  <p className="text-[11px] text-gray-500">Format PNG, JPG, JPEG (Kompresi Otomatis)</p>
                 </div>
               </div>
 

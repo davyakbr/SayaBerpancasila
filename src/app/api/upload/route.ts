@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
   try {
@@ -14,31 +14,18 @@ export async function POST(request: Request) {
       );
     }
 
+    // Convert file to Base64 Data URL (100% safe for Vercel serverless read-only filesystem)
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-
-    // Create unique filename
-    const ext = path.extname(file.name) || '.jpg';
-    const filename = `doc_${Date.now()}_${Math.random().toString(36).substring(2, 8)}${ext}`;
-
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    
-    try {
-      await mkdir(uploadDir, { recursive: true });
-    } catch (e) {
-      // directory already exists
-    }
-
-    const filePath = path.join(uploadDir, filename);
-    await writeFile(filePath, buffer);
-
-    const imageUrl = `/uploads/${filename}`;
+    const mimeType = file.type || 'image/jpeg';
+    const base64Data = buffer.toString('base64');
+    const imageUrl = `data:${mimeType};base64,${base64Data}`;
 
     return NextResponse.json({ imageUrl, success: true });
   } catch (error) {
-    console.error('Error uploading file:', error);
+    console.error('Error processing upload:', error);
     return NextResponse.json(
-      { error: 'Gagal mengunggah gambar' },
+      { error: 'Gagal mengunggah foto. Pastikan ukuran foto di bawah 5MB.' },
       { status: 500 }
     );
   }
