@@ -27,7 +27,7 @@ export default function PrintablePortfolio({
 
   const listToDisplay = singleActivity ? [singleActivity] : activities;
 
-  // Group by week
+  // Group by week number
   const weeksMap: Record<number, ActivityData[]> = {};
   listToDisplay.forEach((act) => {
     const wNum = act.weekNumber || 1;
@@ -113,7 +113,6 @@ export default function PrintablePortfolio({
               {STUDENT_IDENTITY.name} ({STUDENT_IDENTITY.kelas}) - {STUDENT_IDENTITY.sekolah}
             </p>
           </div>
-          <span className="text-xs font-mono text-gray-500">Bulan: {reflection?.month || 'Agustus'} {reflection?.year || 2026}</span>
         </div>
 
         {sortedWeekNumbers.map((wNum) => {
@@ -166,18 +165,18 @@ export default function PrintablePortfolio({
           );
         })}
 
-        {/* Monthly Self Assessment & Reflection Box */}
+        {/* Self Assessment & Reflection Box */}
         <div className="border border-gray-400 rounded-xl p-4 bg-gray-50 space-y-2">
           <div className="flex justify-between items-center border-b border-gray-300 pb-2">
             <span className="font-bold text-xs uppercase text-gray-800">
-              Penilaian Diri Bulanan ({reflection?.month || 'Agustus'} {reflection?.year || 2026}):
+              Refleksi & Alasan Penilaian:
             </span>
-            <span className="font-black text-lg text-rose-900">{reflection?.averageScore || 8.5} / 10</span>
           </div>
           <div>
-            <p className="font-bold text-[11px] text-gray-700">Alasan Penilaian & Refleksi Bulanan:</p>
             <p className="text-xs italic text-gray-800">
-              "{reflection?.reason || 'Saya telah berusaha menjalankan kegiatan positif yang mencerminkan 5 Sila Pancasila selama bulan ini.'}"
+              {reflection?.reason && reflection.reason.trim() !== ''
+                ? `"${reflection.reason}"`
+                : '(Belum ada refleksi yang ditulis)'}
             </p>
           </div>
         </div>

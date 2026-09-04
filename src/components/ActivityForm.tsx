@@ -40,7 +40,9 @@ export default function ActivityForm({ initialData, isEdit = false }: ActivityFo
 
   const handleDateChange = (newDateStr: string) => {
     setDate(newDateStr);
-    setWeekNumber(calculateWeekFromDate(newDateStr));
+    if (!isEdit && !initialData) {
+      setWeekNumber(calculateWeekFromDate(newDateStr));
+    }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,8 +77,8 @@ export default function ActivityForm({ initialData, isEdit = false }: ActivityFo
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !date || !sila) {
-      setErrorMsg('Harap isi judul kegiatan, tanggal, dan pilih Sila');
+    if (!title || !date || !sila || !weekNumber) {
+      setErrorMsg('Harap isi judul kegiatan, tanggal, nomor Minggu, dan pilih Sila');
       return;
     }
 
@@ -87,7 +89,7 @@ export default function ActivityForm({ initialData, isEdit = false }: ActivityFo
       title,
       date,
       sila,
-      weekNumber,
+      weekNumber: Number(weekNumber),
       imageUrl,
     };
 
@@ -144,7 +146,7 @@ export default function ActivityForm({ initialData, isEdit = false }: ActivityFo
             {isEdit ? 'Edit Penerapan Kegiatan' : 'Catat Penerapan Kegiatan Pancasila'}
           </h2>
           <p className="text-xs sm:text-sm text-gray-600 mt-1">
-            Masukkan penerapan kegiatan harian, tanggal, dan pilih Minggu ke berapa tabel dimasukkan.
+            Masukkan penerapan kegiatan harian, tanggal, dan ketikkan Minggu ke berapa kegiatan ini dimasukkan.
           </p>
         </div>
 
@@ -179,25 +181,30 @@ export default function ActivityForm({ initialData, isEdit = false }: ActivityFo
               />
             </div>
 
-            {/* Week Selector */}
+            {/* Manual Week Number Input (Admin Types Any Week Number) */}
             <div className="space-y-2">
               <label className="block text-sm font-bold text-gray-800">
-                Pilih Minggu Tabel <span className="text-rose-600">*</span>
+                Minggu ke- <span className="text-rose-600">*</span>
               </label>
-              <select
-                value={weekNumber}
-                onChange={(e) => setWeekNumber(parseInt(e.target.value, 10))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 font-semibold text-sm focus:ring-2 focus:ring-rose-800 shadow-xs"
-              >
-                <option value={1}>Minggu ke-1</option>
-                <option value={2}>Minggu ke-2</option>
-                <option value={3}>Minggu ke-3</option>
-                <option value={4}>Minggu ke-4</option>
-              </select>
+              <div className="relative">
+                <input
+                  type="number"
+                  min={1}
+                  max={52}
+                  required
+                  placeholder="Ketikkan angka minggu (Contoh: 1, 2, 5, 10...)"
+                  value={weekNumber || ''}
+                  onChange={(e) => setWeekNumber(parseInt(e.target.value, 10) || 1)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 font-bold text-sm focus:ring-2 focus:ring-rose-800 shadow-xs"
+                />
+              </div>
+              <p className="text-[11px] text-gray-500 italic">
+                Ketikkan secara bebas nomor minggu kegiatan ini (Admin bebas menentukan).
+              </p>
             </div>
           </div>
 
-          {/* Sila Selection Radio Cards (With Sila 4 overflow fix) */}
+          {/* Sila Selection Radio Cards */}
           <div className="space-y-3">
             <label className="block text-sm font-bold text-gray-900">
               Pilih Sila Pancasila Terkait <span className="text-rose-600">*</span>
